@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+'''
+@ Program: pes
+@ Author: Elisa Damiani
+@ Created: 2024-22-03
+'''
+
+from main import main
+
+if __name__ == "__main__":
+    main()
