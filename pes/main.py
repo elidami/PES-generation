@@ -259,7 +259,7 @@ def main():
         start_time = time.time() 
         solver, v_list_jm2, data_jm2, rbf = get_pes(hs_all, hs_unique_energy, cell, 
                                   title=pes_name, to_fig=plot_name, colorbar_limit=colorbar_limit)
-        print(f"data_jm2: {data_jm2}") #questa potrebbe fare da pes_grid: coordinate+energie (col min a 0!!)
+        #data_jm2: coordinate+energie (col min a 0!!)
         print("PES plot generated.")
         end_time = time.time() 
         elapsed_time_pes = end_time - start_time  # Calcola il tempo trascorso
@@ -281,7 +281,11 @@ def main():
         print("Computing the MEP...")
 
         start_time = time.time() 
-        mep.get_mep(method='zerotemp', optimization='bs_line')
+        mep_line, mep_data = mep.get_mep(method='zerotemp', optimization='bs_line')
+
+        solver.plot(extent=(2, 2), mpts=(200j, 200j), title="mep", to_fig="mep.png", colorbar_limit=colorbar_limit, mep=mep_line)
+        #print(f"mep_line: {mep_line}")
+        #print(f"mep_data: {mep_data}")
         print("MEP completed.")
         end_time = time.time() 
         elapsed_time_mep = end_time - start_time  

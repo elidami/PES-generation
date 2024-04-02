@@ -80,6 +80,8 @@ class MEP:
         if optimization == 'bs_line':
             self.bsmep_data.update({'theta': values[2][1]})
 
+        return self.mep, self.mep_data
+
     def get_shear_strenght(self, delta=0.01):
         """
         Calculate the shear strength along the MEP and save it as attribute.

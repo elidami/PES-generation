@@ -7,7 +7,7 @@ from pes_script import PES
 # =============================================================================
 
 
-def get_pes(hs_all, E, cell, density=20, title=None, to_fig=None, colorbar_limit=None):
+def get_pes(hs_all, E, cell, density=20, title=None, to_fig=None, colorbar_limit=None, mep = None):
     """
     Interpolate the PES using a list of high symmetry points and energies.
     
@@ -77,13 +77,12 @@ def get_pes(hs_all, E, cell, density=20, title=None, to_fig=None, colorbar_limit
     solver = PES(data, cell)
     #solver.make_pes(replicate_of=(5, 5), density=20, tol=1e-4) #OMAR
     solver.make_pes(replicate_of=(5, 5), density=20, tol=1e-4) #ELISA
-    rbf = solver._rbf #ELIA MEP
+    rbf = solver._rbf #ELISA MEP
     
     # Make the plot
     if to_fig is not None:
         #solver.plot(extent=(2, 2), mpts=(200j, 200j), title=title, to_fig=to_fig) #OMAR
-        solver.plot(extent=(2, 2), mpts=(200j, 200j), title=title, to_fig=to_fig, colorbar_limit=colorbar_limit) #ELISA
-    
+        solver.plot(extent=(2, 2), mpts=(200j, 200j), title=title, to_fig=to_fig, colorbar_limit=colorbar_limit, mep=mep) #ELISA
     return solver, v_list, data, rbf
 
 

@@ -303,8 +303,17 @@ class PES(MEP):
         cbar1=plt.colorbar(zt1, ax=ax, orientation=anglerot, shrink=shrink)
         cbar1.set_label(r'$E_{adh} (J/m^2)$', rotation=270, labelpad=20,
                         fontsize=15, family='serif')
+        
         if mep is not None:
-            ax.plot(mep[:, 0], mep[:, 1], '.-', c='yellow', ms=2)
+            mep = np.array(mep)  # Assicurati che mep sia un array numpy
+
+            min_x = mep[:, 0].min()
+            min_y = mep[:, 1].min()
+
+            mep[:, 0] -= min_x
+            mep[:, 1] -= min_y -1.5
+            ax.plot(mep[:, 0], mep[:, 1], '.-', c='black', ms=2)
+            
         if title is not None:
             plt.title("PES for " + str(title), fontsize=18, family='serif')
         
