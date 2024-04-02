@@ -93,9 +93,9 @@ def write_input(output_folder, structures, shifts):
         poscar = Poscar(struct,selective_dynamics=selective_dynamics)
         poscar.write_file(os.path.join(folder, 'POSCAR'))
 
-        ## Copy the INCAR, KPOINTS, POTCAR and jobscript files to the subfolder
-        #for file in ['INCAR', 'KPOINTS', 'POTCAR', 'jobscript']:
-        #    shutil.copyfile(file, os.path.join(folder, file))
+        # Copy the INCAR, KPOINTS, POTCAR and jobscript files to the subfolder
+        for file in ['INCAR', 'KPOINTS', 'POTCAR', 'jobscript']:
+            shutil.copyfile(file, os.path.join(folder, file))
 
 def launch_jobs_in_subfolders(main_folder, jobscript):
     """
@@ -119,38 +119,10 @@ def launch_jobs_in_subfolders(main_folder, jobscript):
     for folder in subfolders:
         os.chdir(folder)  
         os.system(f'sbatch {jobscript}') 
+        os.chdir(current_folder) 
 
     # Return to the original directory
     os.chdir(current_folder)
-
-'''
-hs = generate_hs("./upper/POSCAR", "./bottom/POSCAR")
-hs_unique = hs['inter_unique']
-hs_all = hs['inter_all']
-
-# Leggi le impostazioni dal file JSON
-with open('settings.json', 'r') as f:
-    settings = json.load(f)
-# Se l'opzione 'decorated' è True, leggi il file POSCAR da una directory
-# Altrimenti, leggi il file POSCAR da un'altra directory
-if settings['decorated']:
-    poscarbot = Poscar.from_file("./decorated/F/POSCAR")
-else:
-    poscarbot = Poscar.from_file("./bottom/POSCAR")
-bot_slab = poscarbot.structure  
-
-poscartop = Poscar.from_file("./upper/POSCAR")
-top_slab = poscartop.structure
-
-structure = generate_pes_inputs(bot_slab, top_slab, hs_unique)
-
-output_folder = './output
-
-
-# scrivi gli input
-write_input(output_folder, structure, hs_unique)
-# lancia i job
-#launch_jobs_in_subfolders('./PES_script/output', 'jobscript')'''
 
 
 def extract_total_energy(outcar_path):
@@ -194,36 +166,6 @@ def extract_energies_and_write_to_json(main_folder, hs_unique, output_file):
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=4)
 
-'''
-# Usa la funzione
-extract_energies_and_write_to_json(output_folder, hs_unique, hs_all, 'results.json')
-
-pes_name = 'C(111)-Cu(111)'
-plot_name = 'PES_' + pes_name.replace('(', '').replace(')', '') + '.png'
-cell = bot_slab.lattice.matrix
-
-# Estrai i vettori del reticolo dalla matrice del reticolo
-a = np.array(cell[0])
-b = np.array(cell[1])
-
-# Calcola l'area come il modulo del prodotto vettoriale di a e b
-area = np.linalg.norm(np.cross(a, b))
-
-# Apri il file JSON e carica i dati
-with open('results.json', 'r') as f:
-    data = json.load(f)
-
-hs_unique = data['hs_unique']
-# Converte l'energia da eV a J/m^2
-for item in hs_unique:
-    item[3] = item[3] * 16.0218 / area
-
-
-#nel codice originale get_pes ha come input hs_all sputati fuori dall'FT precedente (solo coordinate), mentre hs_unique_eV (quindi contenenti anche l'info dell'energia in J/m^2)
-_, v_list_jm2, data_jm2 = get_pes(hs_all, hs_unique, cell, 
-                                  title=pes_name, to_fig=plot_name)'''
-
-
 def main():
 
     # Read settings from json file
@@ -265,7 +207,7 @@ def main():
         print("Input files Generated.")
         
         # Launch jobs
-        #launch_jobs_in_subfolders('./output', 'jobscript')
+        launch_jobs_in_subfolders('./output', 'jobscript')
         
 
 
