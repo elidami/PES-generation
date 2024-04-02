@@ -1,6 +1,6 @@
 import numpy as np
 from solidstate import pbc_coordinates
-from pes import PES
+from pes_script import PES
 
 # =============================================================================
 # EVALUATION OF THE PES - MAIN
@@ -75,15 +75,16 @@ def get_pes(hs_all, E, cell, density=20, title=None, to_fig=None, colorbar_limit
     # Interpolate the data with Radial Basis Function
     # data_rep = replicate(data, cell, replicate_of=(3, 3) )
     solver = PES(data, cell)
-    solver.make_pes(replicate_of=(7, 7), density=20, tol=1e-4) #OMAR
-    #solver.make_pes(replicate_of=(3, 3), density=20, tol=1e-4) #ELISA
+    #solver.make_pes(replicate_of=(5, 5), density=20, tol=1e-4) #OMAR
+    solver.make_pes(replicate_of=(5, 5), density=20, tol=1e-4) #ELISA
+    rbf = solver._rbf #ELIA MEP
     
     # Make the plot
     if to_fig is not None:
         #solver.plot(extent=(2, 2), mpts=(200j, 200j), title=title, to_fig=to_fig) #OMAR
-        solver.plot(extent=(3, 3), mpts=(200j, 200j), title=title, to_fig=to_fig, colorbar_limit=colorbar_limit) #ELISA
+        solver.plot(extent=(2, 2), mpts=(200j, 200j), title=title, to_fig=to_fig, colorbar_limit=colorbar_limit) #ELISA
     
-    return solver, v_list, data
+    return solver, v_list, data, rbf
 
 
 # =============================================================================

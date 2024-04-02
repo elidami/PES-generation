@@ -191,13 +191,19 @@ class PES(MEP):
         data, _ = replicate_2d(data, cell_2d, replicate_of, symm=True)
         data = rm_duplicates_2d(data)
         print('length data of interpolation:', len(data))
-        rbf = Rbf(data[:, 0], data[:, 1], data[:, 2], function='cubic')
+        #rbf = Rbf(data[:, 0], data[:, 1], data[:, 2], function='cubic')
+
+        #implementazione con RBFInterpolator
+        from scipy.interpolate import RBFInterpolator
+        rbf = RBFInterpolator(data[:, :2], data[:, 2], kernel='cubic')
+
 
         # Calculate the PES on a very dense and uniform grid. Useful for further 
         # analysis (MEP, shear strength) and to plot the PES
         if density is not None:
             coordinates = generate_uniform_grid(cell, density, to_plot=False)
-            energy= rbf(coordinates[:, 0], coordinates[:, 1])
+            #energy= rbf(coordinates[:, 0], coordinates[:, 1])
+            energy= rbf(coordinates[:, :2]) #RBFInterpolator
             pes = np.column_stack([coordinates[:, :2], energy])
         else:
             pes = data
@@ -223,8 +229,12 @@ class PES(MEP):
 
         return theta
     
-    def rbf(self, x, y):
-        return self._rbf(x, y)
+    #def rbf(self, x, y):
+        #return self._rbf(x, y)
+    
+    #RBFInterpolator
+    def rbf(self, x):
+        return self._rbf(x)
     
     def plot_cell(self, replicate_of=(1, 1), is_2d=False):
         
@@ -263,7 +273,12 @@ class PES(MEP):
 
         x, y = np.mgrid[- extent[0] * a * int(symm) : extent[0] * a : mptx,
                         - extent[1] * b * int(symm) : extent[1] * b : mpty]
-        z = self.rbf(x, y)
+        #z = self.rbf(x, y)
+        #RBFInterpolator
+        z = self.rbf(np.column_stack([x.ravel(), y.ravel()]))
+        # Reshape z to have the same shape as x and y
+        z = z.reshape(x.shape)
+
         z -= np.min(z)
 
         # Create the plot
@@ -271,9 +286,15 @@ class PES(MEP):
         ax = fig.add_subplot(111)
         ax.set_aspect('equal')
         anglerot='vertical'
+        #zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
+        #zt1.set_clim(vmin=0, vmax=colorbar_limit) # ELISA: added to set the scale of the colorbar
+
+        # Normalizza la colorbar (ELISA): modifica per la scala colori del grafico PES
+        from matplotlib.colors import Normalize
+        norm = Normalize(vmin=0, vmax=colorbar_limit)
         zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
-        zt1.set_clim(vmin=0, vmax=colorbar_limit) # ELISA: added to set the scale of the colorbar
-        
+        zt1.set_clim(vmin=0, vmax=colorbar_limit)
+
         # Add legend center the plot and write axis labels
         ax.axis([-extent[0] * a * int(symm), extent[0] * a, 
                  -extent[1] * b * int(symm), extent[1] * b])
