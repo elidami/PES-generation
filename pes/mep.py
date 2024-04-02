@@ -3,13 +3,13 @@
 
 #import os
 
-#import numpy as np
-#from scipy.interpolate import interp1d
+import numpy as np
+from scipy.interpolate import interp1d
 
-#from tribchem.highput.utils.tasktools import read_default_params
-#from tribchem.physics.tribology.shearstrength import ShearStrength
-#from tribchem.physics.base.math import rbf_derive_line
-#from tribchem.physics.base.solidstate import zfill_cell
+#rom tasktools import read_default_params
+from shearstrength import ShearStrength
+from shearstrength import rbf_derive_line
+from solidstate import zfill_cell
 
 
 #currentdir = os.path.dirname(__file__)
@@ -25,8 +25,8 @@ class MEP:
     """
     
     #defaults = currentdir + '/defaults_tribo.json'
-    #method = ['zerotemp']
-    #optimization = [None, 'x', 'y', 'bs_line']
+    method = ['zerotemp']
+    optimization = [None, 'x', 'y', 'bs_line']
 
     def __init__(self, rbf, cell):
         """
@@ -54,7 +54,7 @@ class MEP:
 
         self.rbf = rbf
         self.cell = cell
-'''
+
     def get_mep(self, method='zerotemp', optimization='bs_line', **kwargs):
         """
         Wrapper to start the MEP calculation. See __get_mep for documentation.
@@ -111,6 +111,7 @@ class MEP:
                               "vz": data[3],
                               "ve": data[4],
                               "force": data[5]})
+        return shear, data
 
     def __get_shear_strength(self, x, y, rbf, delta=0.01):
         return ShearStrength.get_shear_strength(x, y, rbf, delta)
@@ -189,8 +190,16 @@ class MEP:
         """
         
         # Initialize the parameters for the computation
-        p = read_default_params(MEP.defaults, 'zerotemp', kwargs)
-        npts, nstepmax, h, extent, delta, tol = p['npts'], p['nstepmax'], p['h'], p['extent'], p['delta'], p['tol']
+        #p = read_default_params(MEP.defaults, 'zerotemp', kwargs)
+        #npts, nstepmax, h, extent, delta, tol = p['npts'], p['nstepmax'], p['h'], p['extent'], p['delta'], p['tol']
+        
+        #ELISA
+        npts = 101
+        extent = [1.5, 1.5]
+        h = 0.001
+        nstepmax = 99999
+        tol = 1e-7
+        delta = 0.01
         
         # Calculate the initial string
         data = initialize_string(cell=cell, rbf=rbf, optimization=optimization, npts=npts,
@@ -219,11 +228,19 @@ class MEP:
         for nstep in range(int(nstepmax)):
             # Calculation of the x and y-components of the force.
             # dVx and dVy are the derivative of the potential
-            tempValp = rbf(x + de, y)
-            tempValm = rbf(x - de, y)
+            #tempValp = rbf(x + de, y)
+            #tempValm = rbf(x - de, y)
+
+            #RBFInterpolator
+            tempValp = rbf(np.column_stack([x + de, y]))
+            tempValm = rbf(np.column_stack([x - de, y]))
             dVx = 0.5 * (tempValp - tempValm) / delta
-            tempValp = rbf(x, y + de)
-            tempValm = rbf(x, y - de)
+            #tempValp = rbf(x, y + de)
+            #tempValm = rbf(x, y - de)
+
+            #RBFInterpolator
+            tempValp = rbf(np.column_stack([x, y + de]))
+            tempValm = rbf(np.column_stack([x, y - de]))
             dVy = 0.5 * (tempValp - tempValm) / delta
 
             # String steps:
@@ -383,4 +400,4 @@ def get_bs_line(cell, rbf, npts=101, extent=[1.5, 1.5], delta_theta=1,
     x += np.random.randn(len(x)) * (xlim[1] - xlim[0]) / 10000
     y += np.random.randn(len(y)) * (ylim[1] - ylim[0]) / 10000
     
-    return x, y, ss, theta'''
+    return x, y, ss, theta

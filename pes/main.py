@@ -6,6 +6,7 @@ from generate_pes_input import generate_pes_inputs
 import os, sys, shutil, json
 from potensurf import get_pes
 import numpy as np
+from mep import MEP
 from pymatgen.io.vasp.outputs import Outcar
 
 
@@ -264,7 +265,7 @@ def main():
         print("Input files Generated.")
         
         # Launch jobs
-        #launch_jobs_in_subfolders('./PES_script/output', 'jobscript')
+        #launch_jobs_in_subfolders('./output', 'jobscript')
         
 
 
@@ -311,9 +312,43 @@ def main():
             
         # Plot the PES
         print("Performing the interpolation...")
-        _, v_list_jm2, data_jm2 = get_pes(hs_all, hs_unique_energy, cell, 
+
+        import time
+        start_time = time.time() 
+        solver, v_list_jm2, data_jm2, rbf = get_pes(hs_all, hs_unique_energy, cell, 
                                   title=pes_name, to_fig=plot_name, colorbar_limit=colorbar_limit)
+        print(f"data_jm2: {data_jm2}") #questa potrebbe fare da pes_grid: coordinate+energie (col min a 0!!)
         print("PES plot generated.")
+        end_time = time.time() 
+        elapsed_time_pes = end_time - start_time  # Calcola il tempo trascorso
+        print(f"PES time: {elapsed_time_pes} seconds") 
+        
+        data = {
+                'all_values': jsanitize(v_list_jm2),
+                'pes_grid': jsanitize(data_jm2),
+                }
+        
+        with open('./data_for_mep.json', 'w') as f:
+            json.dump(data, f, indent=4)
+            
+        
+        # Calculate the shear strength
+        #mep = MEP(rbf=params['rbf'], cell=params['pes_grid'])
+        mep = MEP(rbf=rbf, cell=cell) 
+        print("Object MEP created.")
+        print("Computing the MEP...")
+
+        start_time = time.time() 
+        mep.get_mep(method='zerotemp', optimization='bs_line')
+        print("MEP completed.")
+        end_time = time.time() 
+        elapsed_time_mep = end_time - start_time  
+        print(f"MEP time: {elapsed_time_mep} seconds")
+        
+        shear_strength, data_ss_xy = mep.get_shear_strenght(delta=0.01)
+        print(f"Shear strength: {shear_strength} GPa")
+        #print(f"data_ss_xy: {data_ss_xy}")
+
 
 
     else:
