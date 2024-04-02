@@ -1,8 +1,8 @@
 {
     "decorated": false,
-    "pes_name": "C(111)-Cu(111)",
+    "pes_name": "Cu(111)-Cu(111)",
     "path_to_bottom_slab": "./bottom/POSCAR",
     "path_to_top_slab": "./upper/POSCAR",
     "path_to_decorated_bottom": "./decorated/POSCAR",
-    "pes_max_value": 0.5
+    "pes_max_value": null
 }
