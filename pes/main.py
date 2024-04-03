@@ -94,8 +94,8 @@ def write_input(output_folder, structures, shifts):
         poscar.write_file(os.path.join(folder, 'POSCAR'))
 
         # Copy the INCAR, KPOINTS, POTCAR and jobscript files to the subfolder
-        for file in ['INCAR', 'KPOINTS', 'POTCAR', 'jobscript']:
-            shutil.copyfile(file, os.path.join(folder, file))
+        #for file in ['INCAR', 'KPOINTS', 'POTCAR', 'jobscript']:
+         #   shutil.copyfile(file, os.path.join(folder, file))
 
 def launch_jobs_in_subfolders(main_folder, jobscript):
     """
@@ -207,7 +207,7 @@ def main():
         print("Input files Generated.")
         
         # Launch jobs
-        launch_jobs_in_subfolders('./output', 'jobscript')
+        #launch_jobs_in_subfolders('./output', 'jobscript')
         
 
 
@@ -282,6 +282,7 @@ def main():
 
         start_time = time.time() 
         mep_line, mep_data = mep.get_mep(method='zerotemp', optimization='bs_line')
+        print(mep_line)
 
         solver.plot(extent=(2, 2), mpts=(200j, 200j), title="mep", to_fig="mep.png", colorbar_limit=colorbar_limit, mep=mep_line)
         #print(f"mep_line: {mep_line}")

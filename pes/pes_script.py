@@ -269,10 +269,15 @@ class PES(MEP):
         a = np.sum(np.abs(self.cell_2d[:, 0]))
         b = np.sum(np.abs(self.cell_2d[:, 1]))
 
+        print("a:", a)
+        print("b:", b)
+
         mptx, mpty = (mpts, mpts) if isinstance(mpts, complex) else mpts
 
-        x, y = np.mgrid[- extent[0] * a * int(symm) : extent[0] * a : mptx,
-                        - extent[1] * b * int(symm) : extent[1] * b : mpty]
+        #x, y = np.mgrid[- extent[0] * a * int(symm) : extent[0] * a : mptx,
+         #               - extent[1] * b * int(symm) : extent[1] * b : mpty]
+        x, y = np.mgrid[- extent[0] * a  : extent[0] * a : mptx,
+                - extent[1] * b  : extent[1] * b : mpty]
         #z = self.rbf(x, y)
         #RBFInterpolator
         z = self.rbf(np.column_stack([x.ravel(), y.ravel()]))
@@ -286,18 +291,18 @@ class PES(MEP):
         ax = fig.add_subplot(111)
         ax.set_aspect('equal')
         anglerot='vertical'
-        #zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
+        zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
         #zt1.set_clim(vmin=0, vmax=colorbar_limit) # ELISA: added to set the scale of the colorbar
 
         # Normalizza la colorbar (ELISA): modifica per la scala colori del grafico PES
-        from matplotlib.colors import Normalize
-        norm = Normalize(vmin=0, vmax=colorbar_limit)
-        zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
-        zt1.set_clim(vmin=0, vmax=colorbar_limit)
+        #from matplotlib.colors import Normalize
+        #norm = Normalize(vmin=0, vmax=colorbar_limit)
+        #zt1=plt.contourf(x, y, z, level, cmap=plt.cm.RdYlBu_r)
+        #zt1.set_clim(vmin=0, vmax=colorbar_limit)
 
         # Add legend center the plot and write axis labels
-        ax.axis([-extent[0] * a * int(symm), extent[0] * a, 
-                 -extent[1] * b * int(symm), extent[1] * b])
+        #ax.axis([-extent[0] * a * int(symm), extent[0] * a, 
+            #     -extent[1] * b * int(symm), extent[1] * b])
         plt.xlabel(r"distance ($\AA$)", fontsize=12, family='serif')
         plt.ylabel(r"distance ($\AA$)", fontsize=12, family='serif')
         cbar1=plt.colorbar(zt1, ax=ax, orientation=anglerot, shrink=shrink)
@@ -305,14 +310,14 @@ class PES(MEP):
                         fontsize=15, family='serif')
         
         if mep is not None:
-            mep = np.array(mep)  # Assicurati che mep sia un array numpy
-
-            min_x = mep[:, 0].min()
-            min_y = mep[:, 1].min()
-
-            mep[:, 0] -= min_x
-            mep[:, 1] -= min_y -1.5
-            ax.plot(mep[:, 0], mep[:, 1], '.-', c='black', ms=2)
+            #mep = np.array(mep)  # Assicurati che mep sia un array numpy
+#
+            #min_x = mep[:, 0].min()
+            #min_y = mep[:, 1].min()
+#
+            #mep[:, 0] -= min_x
+            #mep[:, 1] -= min_y -1.5
+            ax.plot(mep[:, 0], mep[:, 1], '.-', c='black', ms=2) #OMAR
             
         if title is not None:
             plt.title("PES for " + str(title), fontsize=18, family='serif')

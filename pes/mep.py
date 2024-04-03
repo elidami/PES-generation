@@ -5,6 +5,7 @@
 
 import numpy as np
 from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 
 #rom tasktools import read_default_params
 from shearstrength import ShearStrength
@@ -213,9 +214,9 @@ class MEP:
         # with griddata generate the derivative. Gradients on a mesh then should be only interpolated.
 
         # initial parametrization  
-        dx = x - np.roll(x, 1)
+        dx = x - np.roll(x, 1) #x(i)-x(i-1)
         dy = y - np.roll(y, 1)
-        dx[0] = 0
+        dx[0] = 0 #i dx e dy non sono uguali tra loro perchè la stringa in fase di inizializzazione è stata randomizzata
         dy[0] = 0
         lxy  = np.cumsum(np.sqrt(dx**2 + dy**2))        
         lxy /= lxy[npts - 1]
@@ -228,18 +229,22 @@ class MEP:
          
         # Main loop
         for nstep in range(int(nstepmax)):
+            if nstep ==1000:
+                data_to_file = np.column_stack((x, y))
+                # Salva l'array in un file CSV
+                np.savetxt("prima.csv", data_to_file, delimiter=" ")
             # Calculation of the x and y-components of the force.
             # dVx and dVy are the derivative of the potential
+
             #tempValp = rbf(x + de, y)
             #tempValm = rbf(x - de, y)
-
             #RBFInterpolator
             tempValp = rbf(np.column_stack([x + de, y]))
             tempValm = rbf(np.column_stack([x - de, y]))
             dVx = 0.5 * (tempValp - tempValm) / delta
+            
             #tempValp = rbf(x, y + de)
             #tempValm = rbf(x, y - de)
-
             #RBFInterpolator
             tempValp = rbf(np.column_stack([x, y + de]))
             tempValm = rbf(np.column_stack([x, y - de]))
@@ -262,13 +267,17 @@ class MEP:
             x  =  xf(g)
             yf = interp1d(lxy, y, kind='cubic')
             y  =  yf(g)
-            t = (np.linalg.norm(x - x0) + np.linalg.norm(y - y0)) / npts
+            t = (np.linalg.norm(x - x0) + np.linalg.norm(y - y0)) / npts #distanza media tra i punti
+            if nstep ==1000:
+                data_to_file = np.column_stack((x, y))
+                # Salva l'array in un file CSV
+                np.savetxt("dopo.csv", data_to_file, delimiter=" ")
             if t <= tol:
                break
 
         mep = np.column_stack([x, y])
         mep_convergence = (nstep, t)
-        
+        print("nstep: ", nstep)
         return mep, mep_convergence, data
 
 

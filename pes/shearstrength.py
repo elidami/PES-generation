@@ -95,7 +95,7 @@ class ShearStrength:
         """
     
         delta = 0.01
-        npoints = 300
+        npoints = 900 #ELISA messo 900 invece di 300
     
         if params != None and isinstance(params, dict):
             for k in params:
@@ -106,12 +106,19 @@ class ShearStrength:
     
         alat_x = cell[0, 0]
         alat_y = cell[1, 1]
+        print(f"alat_x: {alat_x}")
+        print(f"alat_y: {alat_y}")
     
-        x = np.arange(-1.5 * alat_x, 1.5 * alat_x, alat_x / npoints)
-        y = np.arange(-1.5 * alat_y, 1.5 * alat_y, alat_y / npoints)   
+        #x = np.arange(-1.5 * alat_x, 1.5 * alat_x, alat_x / npoints)
+        #y = np.arange(-1.5 * alat_y, 1.5 * alat_y, alat_y / npoints)  
+        #y = y[:-1]
+        x = np.linspace(-1.5 * alat_x, 1.5 * alat_x, npoints) #ELISA messo linspace invece di arange
+        y = np.linspace(-1.5 * alat_y, 1.5 * alat_y, npoints) #ELISA messo linspace invece di arange
+        print(f"len x: {len(x)}")
+        print(f"len y: {len(y)}")
         zdev_x = np.zeros(len(x))
         zdev_y = np.zeros(len(y))
-     
+
         for i in range(len(x)):
             coordx = x[i]
             coordy = y[i]
